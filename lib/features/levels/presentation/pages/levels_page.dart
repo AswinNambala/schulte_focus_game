@@ -164,56 +164,59 @@ class _LevelCard extends StatelessWidget {
                 : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (isUnlocked) ...[
-                  Text(
-                    'LVL ${level.levelNumber}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isUnlocked) ...[
+                    Text(
+                      'LVL ${level.levelNumber}',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${level.gridSize}x${level.gridSize} • ${level.targetTimeSeconds}s',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[400],
+                    const SizedBox(height: 2),
+                    Text(
+                      '${level.gridSize}x${level.gridSize} • ${level.targetTimeSeconds}s',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[400],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  // Stars
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (starIdx) {
-                      final earned = starIdx < level.stars;
-                      return Icon(
-                        earned ? Icons.star_rounded : Icons.star_outline_rounded,
-                        color: earned ? Colors.amber : Colors.grey[600],
-                        size: 16,
-                      );
-                    }),
-                  ),
-                ] else ...[
-                  Icon(
-                    Icons.lock_rounded,
-                    color: Colors.grey[600],
-                    size: 26,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Lvl ${level.levelNumber}',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 6),
+                    // Stars
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (starIdx) {
+                        final earned = starIdx < level.stars;
+                        return Icon(
+                          earned ? Icons.star_rounded : Icons.star_outline_rounded,
+                          color: earned ? Colors.amber : Colors.grey[600],
+                          size: 16,
+                        );
+                      }),
                     ),
-                  ),
+                  ] else ...[
+                    Icon(
+                      Icons.lock_rounded,
+                      color: Colors.grey[600],
+                      size: 26,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Lvl ${level.levelNumber}',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

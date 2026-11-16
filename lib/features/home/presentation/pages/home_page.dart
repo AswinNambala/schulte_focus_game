@@ -450,26 +450,31 @@ class HomePage extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(context, 'Total Games', '$totalSessions', Icons.sports_score_rounded),
-                Container(
-                  height: 40,
-                  width: 1,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                ),
-                _buildStatItem(context, 'Best Record', bestTimeStr, Icons.emoji_events_outlined),
-                Container(
-                  height: 40,
-                  width: 1,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                ),
-                TextButton(
-                  onPressed: () => context.go(AppRoutes.reports),
-                  child: const Text('View All >'),
-                ),
-              ],
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem(context, 'Total Games', '$totalSessions', Icons.sports_score_rounded),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    height: 40,
+                    width: 1,
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                  _buildStatItem(context, 'Best Record', bestTimeStr, Icons.emoji_events_outlined),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    height: 40,
+                    width: 1,
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                  TextButton(
+                    onPressed: () => context.go(AppRoutes.reports),
+                    child: const Text('View All >'),
+                  ),
+                ],
+              ),
             ),
           ),
         );
