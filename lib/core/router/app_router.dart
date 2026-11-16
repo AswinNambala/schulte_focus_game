@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/privacy_policy_page.dart';
+import '../../features/auth/presentation/pages/signup_page.dart';
+import '../../features/auth/presentation/pages/splash_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -14,8 +18,10 @@ class AppRoutes {
   static const String privacyPolicy = '/privacy-policy';
 }
 
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 class AppRouter {
   static GoRouter createRouter() {
@@ -25,29 +31,19 @@ class AppRouter {
       routes: [
         GoRoute(
           path: AppRoutes.splash,
-          builder: (context, state) => const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
+          builder: (context, state) => const SplashPage(),
         ),
         GoRoute(
           path: AppRoutes.login,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Login Screen')),
-          ),
+          builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
           path: AppRoutes.signup,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Sign Up Screen')),
-          ),
+          builder: (context, state) => const SignUpPage(),
         ),
         GoRoute(
           path: AppRoutes.privacyPolicy,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Privacy Policy')),
-          ),
+          builder: (context, state) => const PrivacyPolicyPage(),
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -90,7 +86,7 @@ class AppRouter {
                 GoRoute(
                   path: AppRoutes.home,
                   builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Home')),
+                    body: Center(child: Text('Home Screen')),
                   ),
                 ),
               ],
@@ -100,7 +96,7 @@ class AppRouter {
                 GoRoute(
                   path: AppRoutes.levels,
                   builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Levels')),
+                    body: Center(child: Text('Levels Screen')),
                   ),
                 ),
               ],
@@ -110,7 +106,7 @@ class AppRouter {
                 GoRoute(
                   path: AppRoutes.reports,
                   builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Reports')),
+                    body: Center(child: Text('Reports Screen')),
                   ),
                 ),
               ],
@@ -120,7 +116,7 @@ class AppRouter {
                 GoRoute(
                   path: AppRoutes.profile,
                   builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Profile')),
+                    body: Center(child: Text('Profile Screen')),
                   ),
                 ),
               ],
