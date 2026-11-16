@@ -1,30 +1,121 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:schulte_focus/features/auth/domain/entities/user_entity.dart';
+import 'package:schulte_focus/features/auth/domain/usecases/auth_usecases.dart';
+import 'package:schulte_focus/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:schulte_focus/features/levels/domain/entities/level_info.dart';
+import 'package:schulte_focus/features/levels/domain/repositories/level_repository.dart';
+import 'package:schulte_focus/features/levels/presentation/bloc/level_bloc.dart';
+import 'package:schulte_focus/features/reports/domain/usecases/report_usecases.dart';
+import 'package:schulte_focus/features/reports/presentation/bloc/report_bloc.dart';
+import 'package:schulte_focus/features/settings/domain/entities/app_settings.dart';
+import 'package:schulte_focus/features/settings/domain/repositories/settings_repository.dart';
+import 'package:schulte_focus/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:schulte_focus/core/di/injection.dart' as di;
+import 'package:schulte_focus/core/theme/theme_cubit.dart';
 import 'package:schulte_focus/main.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:fpdart/fpdart.dart';
+
+class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
+class MockLoginWithEmailUseCase extends Mock implements LoginWithEmailUseCase {}
+class MockSignUpWithEmailUseCase extends Mock implements SignUpWithEmailUseCase {}
+class MockSignInWithGoogleUseCase extends Mock implements SignInWithGoogleUseCase {}
+class MockSendPasswordResetUseCase extends Mock implements SendPasswordResetUseCase {}
+class MockLogOutUseCase extends Mock implements LogOutUseCase {}
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
+class MockLevelRepository extends Mock implements LevelRepository {}
+class MockGetReportsUseCase extends Mock implements GetReportsUseCase {}
+class MockSaveSessionUseCase extends Mock implements SaveSessionUseCase {}
+class MockSettingsRepository extends Mock implements SettingsRepository {}
+class FakeAppSettings extends Fake implements AppSettings {}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() {
+    registerFallbackValue(FakeAppSettings());
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  late MockGetCurrentUserUseCase mockGetCurrentUserUseCase;
+  late MockLevelRepository mockLevelRepository;
+  late MockGetReportsUseCase mockGetReportsUseCase;
+  late MockSaveSessionUseCase mockSaveSessionUseCase;
+  late MockSettingsRepository mockSettingsRepository;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  setUp(() {
+    mockGetCurrentUserUseCase = MockGetCurrentUserUseCase();
+    final mockLogin = MockLoginWithEmailUseCase();
+    final mockSignUp = MockSignUpWithEmailUseCase();
+    final mockGoogle = MockSignInWithGoogleUseCase();
+    final mockReset = MockSendPasswordResetUseCase();
+    final mockLogout = MockLogOutUseCase();
+    final mockDelete = MockDeleteAccountUseCase();
+    mockLevelRepository = MockLevelRepository();
+    mockGetReportsUseCase = MockGetReportsUseCase();
+    mockSaveSessionUseCase = MockSaveSessionUseCase();
+    mockSettingsRepository = MockSettingsRepository();
+
+    when(() => mockSettingsRepository.getSettings()).thenAnswer(
+      (_) async => const AppSettings(),
+    );
+    when(() => mockSettingsRepository.saveSettings(any())).thenAnswer((_) async {});
+
+    when(() => mockGetCurrentUserUseCase()).thenAnswer(
+      (_) async => Right(
+        UserEntity(
+          uid: 'uid1',
+          email: 'test@example.com',
+          displayName: 'Player',
+          createdAt: DateTime(2026, 1, 1),
+        ),
+      ),
+    );
+
+    when(() => mockLevelRepository.getLevels()).thenAnswer(
+      (_) async => [
+        const LevelInfo(
+          levelNumber: 1,
+          gridSize: 3,
+          ringCount: 1,
+          targetTimeSeconds: 20,
+          isUnlocked: true,
+        ),
+      ],
+    );
+    when(() => mockLevelRepository.getHighestUnlockedLevel()).thenAnswer((_) async => 1);
+
+    when(() => mockGetReportsUseCase(any())).thenAnswer((_) async => const Right([]));
+
+    di.sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit());
+    di.sl.registerFactory<AuthBloc>(
+      () => AuthBloc(
+        getCurrentUserUseCase: mockGetCurrentUserUseCase,
+        loginWithEmailUseCase: mockLogin,
+        signUpWithEmailUseCase: mockSignUp,
+        signInWithGoogleUseCase: mockGoogle,
+        sendPasswordResetUseCase: mockReset,
+        logOutUseCase: mockLogout,
+        deleteAccountUseCase: mockDelete,
+      ),
+    );
+    di.sl.registerFactory<LevelBloc>(() => LevelBloc(repository: mockLevelRepository));
+    di.sl.registerFactory<ReportBloc>(
+      () => ReportBloc(
+        getReportsUseCase: mockGetReportsUseCase,
+        saveSessionUseCase: mockSaveSessionUseCase,
+      ),
+    );
+    di.sl.registerFactory<SettingsCubit>(
+      () => SettingsCubit(repository: mockSettingsRepository),
+    );
+  });
+
+  tearDown(() async {
+    await di.sl.reset();
+  });
+
+  testWidgets('App renders successfully', (WidgetTester tester) async {
+    await tester.pumpWidget(const SchulteFocusApp());
     await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(SchulteFocusApp), findsOneWidget);
   });
 }

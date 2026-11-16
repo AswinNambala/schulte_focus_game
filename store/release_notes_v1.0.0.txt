@@ -1,0 +1,10 @@
+Welcome to the initial production release of Schulte Focus (v1.0.0)!
+
+What's New:
+• Classic Schulte Grid Mode with customizable 3x3 to 7x7 layouts.
+• Innovative 3D Concentric Ring Mode with touch-drag rotation and depth-based cell pop animations.
+• Adaptive difficulty system across 20 progressive challenge levels.
+• Rich performance analytics: progress line charts, daily play bar charts, and average reaction time per tap.
+• Offline gameplay with automatic cloud synchronization.
+• Material 3 UI with dark/light themes, colorblind-friendly palette, and tactile haptic feedback.
+• Account management with Google Sign-In and full data deletion support.
