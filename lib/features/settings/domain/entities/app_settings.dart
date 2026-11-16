@@ -12,7 +12,7 @@ class AppSettings extends Equatable {
   final String? lastPlayedDateStr;
 
   const AppSettings({
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.dark,
     this.soundEnabled = true,
     this.hapticsEnabled = true,
     this.colorCells = true,

@@ -135,13 +135,20 @@ class _ReportsPageState extends State<ReportsPage> {
 
                   // Daily Play Time Bar Chart
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Time Spent Per Day',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      const Expanded(
+                        child: Text(
+                          'Time Spent Per Day',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       SegmentedButton<int>(
+                        showSelectedIcon: false,
+                        style: const ButtonStyle(
+                          visualDensity: VisualDensity.compact,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
                         segments: const [
                           ButtonSegment(value: 7, label: Text('7D')),
                           ButtonSegment(value: 30, label: Text('30D')),
@@ -160,44 +167,31 @@ class _ReportsPageState extends State<ReportsPage> {
                   const SizedBox(height: 36),
 
                   // Progress Line Chart
-                  const Text(
-                    'Completion Time Progress',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  // Filter Chips for Mode and Type
                   Row(
                     children: [
-                      ChoiceChip(
-                        label: const Text('Classic'),
-                        selected: state.selectedChartMode == GameMode.classic,
-                        onSelected: (_) => context
-                            .read<ReportBloc>()
-                            .add(const ChartModeFilterChangedEvent(GameMode.classic)),
+                      const Expanded(
+                        child: Text(
+                          'Completion Time Progress',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('3D Ring'),
-                        selected: state.selectedChartMode == GameMode.circular3d,
-                        onSelected: (_) => context
-                            .read<ReportBloc>()
-                            .add(const ChartModeFilterChangedEvent(GameMode.circular3d)),
-                      ),
-                      const Spacer(),
-                      ChoiceChip(
-                        label: const Text('123'),
-                        selected: state.selectedChartTableType == TableType.number,
-                        onSelected: (_) => context
-                            .read<ReportBloc>()
-                            .add(const ChartTableTypeFilterChangedEvent(TableType.number)),
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('ABC'),
-                        selected: state.selectedChartTableType == TableType.letter,
-                        onSelected: (_) => context
-                            .read<ReportBloc>()
-                            .add(const ChartTableTypeFilterChangedEvent(TableType.letter)),
+                      SegmentedButton<TableType>(
+                        showSelectedIcon: false,
+                        style: const ButtonStyle(
+                          visualDensity: VisualDensity.compact,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        segments: const [
+                          ButtonSegment(value: TableType.number, label: Text('123')),
+                          ButtonSegment(value: TableType.letter, label: Text('ABC')),
+                        ],
+                        selected: {state.selectedChartTableType},
+                        onSelectionChanged: (set) {
+                          context
+                              .read<ReportBloc>()
+                              .add(ChartTableTypeFilterChangedEvent(set.first));
+                        },
                       ),
                     ],
                   ),
@@ -472,9 +466,7 @@ class _SessionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormatted = DateFormat('MMM d, h:mm a').format(session.createdAt);
     final seconds = (session.completionTimeMs / 1000.0).toStringAsFixed(1);
-    final modeLabel = session.mode == GameMode.classic
-        ? '${session.gridSize}x${session.gridSize} Classic'
-        : '3D Ring';
+    final modeLabel = '${session.gridSize}x${session.gridSize} Grid (${session.tableType == TableType.number ? "123" : "ABC"})';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -494,9 +486,9 @@ class _SessionListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  session.mode == GameMode.classic
-                      ? Icons.grid_on_rounded
-                      : Icons.blur_circular_rounded,
+                  session.tableType == TableType.number
+                      ? Icons.tag_rounded
+                      : Icons.sort_by_alpha_rounded,
                   color: AppColors.primary,
                   size: 20,
                 ),

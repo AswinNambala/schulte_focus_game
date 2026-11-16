@@ -83,9 +83,9 @@ class SchulteFocusApp extends StatelessWidget {
           return MaterialApp.router(
             title: 'Schulte Focus',
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
+            theme: AppTheme.darkTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: settings.themeMode,
+            themeMode: ThemeMode.dark,
             routerConfig: router,
           );
         },

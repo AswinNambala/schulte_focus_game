@@ -330,34 +330,36 @@ class HomePage extends StatelessWidget {
         ),
         _buildModeCard(
           context,
-          title: '3D Ring 123',
-          subtitle: 'Concentric Numbers',
-          icon: Icons.album_outlined,
+          title: 'Speed 3x3',
+          subtitle: '9 Numbers Sprint',
+          icon: Icons.flash_on_rounded,
           color: Colors.teal,
           onTap: () {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
                 tableType: TableType.number,
-                mode: GameMode.circular3d,
-                ringCount: 2,
+                mode: GameMode.classic,
+                gridSize: 3,
+                targetTimeSeconds: 15,
               ),
             );
           },
         ),
         _buildModeCard(
           context,
-          title: '3D Ring ABC',
-          subtitle: 'Concentric Letters',
-          icon: Icons.motion_photos_on_outlined,
+          title: 'Challenge 6x6',
+          subtitle: '36 Numbers Pro',
+          icon: Icons.psychology_rounded,
           color: Colors.amber.shade800,
           onTap: () {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
-                tableType: TableType.letter,
-                mode: GameMode.circular3d,
-                ringCount: 2,
+                tableType: TableType.number,
+                mode: GameMode.classic,
+                gridSize: 6,
+                targetTimeSeconds: 90,
               ),
             );
           },

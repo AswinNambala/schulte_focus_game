@@ -8,6 +8,7 @@ class GameResultDialog extends StatelessWidget {
   final int stars;
   final VoidCallback onPlayAgain;
   final VoidCallback onContinue;
+  final VoidCallback? onNextLevel;
 
   const GameResultDialog({
     super.key,
@@ -15,6 +16,7 @@ class GameResultDialog extends StatelessWidget {
     required this.stars,
     required this.onPlayAgain,
     required this.onContinue,
+    this.onNextLevel,
   });
 
   String _formatTime(int ms) {
@@ -32,7 +34,7 @@ class GameResultDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -45,7 +47,7 @@ class GameResultDialog extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Icon(
                     earned ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: earned ? Colors.amber : Colors.grey[400],
+                    color: earned ? Colors.amber : Colors.grey[600],
                     size: 48,
                   )
                       .animate(delay: (200 * index).ms)
@@ -53,7 +55,7 @@ class GameResultDialog extends StatelessWidget {
                 );
               }),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             Text(
               stars == 3
@@ -64,7 +66,15 @@ class GameResultDialog extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 4),
+            Text(
+              'Level ${session.level} Cleared ($stars/3 Stars)',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[400],
+              ),
+            ),
+            const SizedBox(height: 16),
 
             // Metrics Box
             Container(
@@ -86,22 +96,56 @@ class GameResultDialog extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // Action Buttons
+            // Next Level Button (Primary)
+            if (onNextLevel != null) ...[
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  label: Text(
+                    'Play Level ${session.level + 1}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: onNextLevel,
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+
+            // Secondary Buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                     onPressed: onPlayAgain,
-                    child: const Text('Play Again'),
+                    child: const Text('Replay'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: ElevatedButton(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                     onPressed: onContinue,
-                    child: const Text('Continue'),
+                    child: const Text('All Levels'),
                   ),
                 ),
               ],
@@ -116,7 +160,7 @@ class GameResultDialog extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
         Text(
           value,
           style: const TextStyle(

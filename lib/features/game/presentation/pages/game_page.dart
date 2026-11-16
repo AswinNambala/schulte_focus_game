@@ -5,12 +5,16 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../levels/domain/services/adaptive_difficulty_service.dart';
+import '../../../levels/presentation/bloc/level_bloc.dart';
+import '../../../levels/presentation/bloc/level_event.dart';
+import '../../../reports/presentation/bloc/report_bloc.dart';
+import '../../../reports/presentation/bloc/report_event.dart';
 import '../../../settings/presentation/bloc/settings_cubit.dart';
 import '../../domain/entities/game_config.dart';
 import '../bloc/game_bloc.dart';
 import '../bloc/game_event.dart';
 import '../bloc/game_state.dart';
-import '../widgets/circular_3d_view.dart';
 import '../widgets/classic_grid_view.dart';
 import '../widgets/game_hud.dart';
 import '../widgets/game_pause_dialog.dart';
@@ -28,7 +32,7 @@ class GamePage extends StatelessWidget {
     final effectiveConfig = config.copyWith(
       colorCells: settings.colorCells,
       colorblindPalette: settings.colorblindPalette,
-      autoRotation: config.autoRotation || settings.autoRotation,
+      mode: GameMode.classic,
     );
 
     return BlocProvider<GameBloc>(
@@ -87,6 +91,20 @@ class _GameViewState extends State<_GameView> {
     final session = state.completedSession;
     if (session == null) return;
 
+    VoidCallback? nextLevelAction;
+    if (session.level < 20 && state.stars >= 1) {
+      nextLevelAction = () {
+        Navigator.of(context).pop();
+        final defaultLevels = AdaptiveDifficultyService.getDefaultLevels();
+        final nextLevel = defaultLevels.firstWhere(
+          (l) => l.levelNumber == session.level + 1,
+          orElse: () => defaultLevels.first,
+        );
+        final nextConfig = nextLevel.toGameConfig(tableType: session.tableType);
+        context.pushReplacement(AppRoutes.game, extra: nextConfig);
+      };
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -94,6 +112,7 @@ class _GameViewState extends State<_GameView> {
         return GameResultDialog(
           session: session,
           stars: state.stars,
+          onNextLevel: nextLevelAction,
           onPlayAgain: () {
             Navigator.of(dialogContext).pop();
             context.read<GameBloc>().add(GameRestartRequested());
@@ -101,7 +120,7 @@ class _GameViewState extends State<_GameView> {
           },
           onContinue: () {
             Navigator.of(dialogContext).pop();
-            context.go(AppRoutes.home);
+            context.go(AppRoutes.levels);
           },
         );
       },
@@ -114,7 +133,20 @@ class _GameViewState extends State<_GameView> {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == GameStatus.completed) {
-          context.read<SettingsCubit>().recordGamePlayed();
+          final session = state.completedSession;
+          if (session != null) {
+            // 1. Calculate & store level progress in LevelBloc
+            context.read<LevelBloc>().add(
+                  LevelCompletedEvent(
+                    session: session,
+                    targetTimeSeconds: state.config.targetTimeSeconds,
+                  ),
+                );
+            // 2. Record session in ReportBloc
+            context.read<ReportBloc>().add(RecordSessionEvent(session));
+            // 3. Update streak in SettingsCubit
+            context.read<SettingsCubit>().recordGamePlayed();
+          }
           _showResultDialog(state);
         }
       },
@@ -142,23 +174,13 @@ class _GameViewState extends State<_GameView> {
                         const SizedBox(height: 24),
                         Expanded(
                           child: Center(
-                            child: state.config.mode == GameMode.circular3d
-                                ? Circular3DView(
-                                    cells: state.cells,
-                                    ringCount: state.config.ringCount,
-                                    autoRotation: state.config.autoRotation,
-                                    rotationSpeed: state.config.rotationSpeed,
-                                    onCellTapped: (cell) {
-                                      context.read<GameBloc>().add(GameCellTapped(cell));
-                                    },
-                                  )
-                                : ClassicGridView(
-                                    gridSize: state.config.gridSize,
-                                    cells: state.cells,
-                                    onCellTapped: (cell) {
-                                      context.read<GameBloc>().add(GameCellTapped(cell));
-                                    },
-                                  ),
+                            child: ClassicGridView(
+                              gridSize: state.config.gridSize,
+                              cells: state.cells,
+                              onCellTapped: (cell) {
+                                context.read<GameBloc>().add(GameCellTapped(cell));
+                              },
+                            ),
                           ),
                         ),
                       ],
