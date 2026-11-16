@@ -1,4 +1,4 @@
-package com.example.schulte_focus
+package com.aswinnambala.schulte_focus
 
 import io.flutter.embedding.android.FlutterActivity
 
