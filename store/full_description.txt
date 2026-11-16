@@ -1,0 +1,45 @@
+Unlock your brain's full visual potential with Schulte Focus — the definitive focus, peripheral vision, and speed reading trainer designed for peak mental agility.
+
+Developed on proven neuro-cognitive principles, Schulte Focus uses classic grid tables and innovative 3D concentric rings to broaden your field of view, sharpen concentration, and accelerate visual reaction times.
+
+WHY TRAIN WITH SCHULTE FOCUS?
+Originally invented by German psychiatrist Walter Schulte, Schulte tables are widely used by pilots, speed readers, competitive athletes, and memory champions to train peripheral perception, reduce eye saccades, and eliminate mental tunnel vision.
+
+Whether preparing for exams, boosting reading comprehension speed, or maintaining razor-sharp daily focus, a 5-minute session per day delivers noticeable improvements in visual attention.
+
+KEY FEATURES & MODES:
+
+1. DUAL GAME MODES:
+• Classic Grid Mode: Tap numbers or letters in ascending sequence on customizable square grids (3x3 up to 7x7). Dynamic reshuffle ensures your eyes never rely on muscle memory alone.
+• 3D Concentric Ring Mode: Experience an immersive, tiltable 3D visual ring. Rotate rings manually or train with gentle auto-rotation to track targets in three dimensions. Tapped cells pop and vanish, leaving gaps that challenge your peripheral scan.
+
+2. NUMBERS & LETTERS:
+• Train with numbers (1 to 25+) or English alphabets (A to Z) to exercise both mathematical and linguistic visual centers.
+
+3. ADAPTIVE LEVEL PROGRESSION (LEVELS 1–20):
+• Intelligent difficulty scaling automatically assesses your completion times and error rates.
+• Finish under target time with minimal errors to level up; struggle or make errors to consolidate skill.
+• Star rating system (1 to 3 stars) to celebrate speed milestones.
+
+4. IN-DEPTH PERFORMANCE ANALYTICS:
+• Detailed reaction speed tracking: View average millisecond reaction time per tap.
+• Progress Charts: Interactive line charts tracking speed improvements across all modes.
+• Daily Play History: Bar charts visualizing minutes trained across 7-day and 30-day windows.
+• Track your personal bests, total games completed, and consistency streaks.
+
+5. SEAMLESS CLOUD SYNC & OFFLINE PLAY:
+• Train anywhere, anytime — fully offline supported with local Hive caching.
+• Sessions automatically synchronize with Cloud Firestore as soon as connectivity returns.
+• Sign in with Google or Email to preserve your level unlocks and streak history across all your Android devices.
+
+6. DESIGNED FOR ACCESSIBILITY & COMFORT:
+• Material 3 Modern Design with full Dark Mode and Light Mode support.
+• Curated vibrant color palettes and High-Contrast Colorblind-friendly mode.
+• Responsive haptic feedback on taps and errors (toggleable in Settings).
+• Full edge-to-edge Android support and predictive back navigation.
+
+7. PRIVACY & DATA CONTROL:
+• Your privacy is our priority. No invasive trackers or data selling.
+• Complete in-app account and data deletion at any time.
+
+Start broadening your visual horizon today. Download Schulte Focus and elevate your focus, peripheral awareness, and speed reading performance!
