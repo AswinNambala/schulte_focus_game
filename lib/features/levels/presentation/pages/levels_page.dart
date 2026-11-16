@@ -18,7 +18,6 @@ class LevelsPage extends StatefulWidget {
 }
 
 class _LevelsPageState extends State<LevelsPage> {
-  GameMode _selectedMode = GameMode.classic;
   TableType _selectedTableType = TableType.number;
 
   @override
@@ -33,7 +32,7 @@ class _LevelsPageState extends State<LevelsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Training Levels (1 - 20)'),
+        title: const Text('Training Levels'),
       ),
       body: BlocBuilder<LevelBloc, LevelState>(
         builder: (context, state) {
@@ -43,67 +42,48 @@ class _LevelsPageState extends State<LevelsPage> {
 
           return Column(
             children: [
-              // Mode & Type Selector
+              // Clean, Centered Table Type Selector (No overflow)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Row(
-                  children: [
-                    // Mode Toggle (Classic / 3D Circle)
-                    Expanded(
-                      child: SegmentedButton<GameMode>(
-                        segments: const [
-                          ButtonSegment(
-                            value: GameMode.classic,
-                            label: Text('Classic'),
-                            icon: Icon(Icons.grid_on_rounded, size: 16),
-                          ),
-                          ButtonSegment(
-                            value: GameMode.circular3d,
-                            label: Text('3D Ring'),
-                            icon: Icon(Icons.blur_circular_rounded, size: 16),
-                          ),
-                        ],
-                        selected: {_selectedMode},
-                        onSelectionChanged: (set) {
-                          setState(() {
-                            _selectedMode = set.first;
-                          });
-                        },
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<TableType>(
+                    showSelectedIcon: false,
+                    style: const ButtonStyle(
+                      visualDensity: VisualDensity.compact,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    segments: const [
+                      ButtonSegment(
+                        value: TableType.number,
+                        label: Text('Numbers (123)'),
+                        icon: Icon(Icons.tag_rounded, size: 16),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Table Type Toggle (Number / Letter)
-                    SegmentedButton<TableType>(
-                      segments: const [
-                        ButtonSegment(
-                          value: TableType.number,
-                          label: Text('123'),
-                        ),
-                        ButtonSegment(
-                          value: TableType.letter,
-                          label: Text('ABC'),
-                        ),
-                      ],
-                      selected: {_selectedTableType},
-                      onSelectionChanged: (set) {
-                        setState(() {
-                          _selectedTableType = set.first;
-                        });
-                      },
-                    ),
-                  ],
+                      ButtonSegment(
+                        value: TableType.letter,
+                        label: Text('Letters (ABC)'),
+                        icon: Icon(Icons.sort_by_alpha_rounded, size: 16),
+                      ),
+                    ],
+                    selected: {_selectedTableType},
+                    onSelectionChanged: (set) {
+                      setState(() {
+                        _selectedTableType = set.first;
+                      });
+                    },
+                  ),
                 ),
               ),
 
               // Level Cards Grid
               Expanded(
                 child: GridView.builder(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.88,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.95,
                   ),
                   itemCount: state.levels.length,
                   itemBuilder: (context, index) {
@@ -114,14 +94,16 @@ class _LevelsPageState extends State<LevelsPage> {
                       onTap: () {
                         if (level.isUnlocked) {
                           final config = level.toGameConfig(
-                            mode: _selectedMode,
+                            mode: GameMode.classic,
                             tableType: _selectedTableType,
                           );
                           context.push(AppRoutes.game, extra: config);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Level ${level.levelNumber} is locked! Complete Level ${level.levelNumber - 1} to unlock.'),
+                              content: Text(
+                                'Level ${level.levelNumber} is locked! Complete Level ${level.levelNumber - 1} to unlock.',
+                              ),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
@@ -158,16 +140,16 @@ class _LevelCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
             color: isUnlocked
                 ? (isDark ? AppColors.darkSurface : AppColors.lightSurface)
                 : (isDark ? Colors.grey[900] : Colors.grey[200]),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isUnlocked
-                  ? AppColors.primary.withValues(alpha: 0.3)
+                  ? AppColors.primary.withValues(alpha: 0.35)
                   : Colors.grey.withValues(alpha: 0.2),
               width: 1.5,
             ),
@@ -181,55 +163,58 @@ class _LevelCard extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isUnlocked) ...[
-                Text(
-                  'LVL ${level.levelNumber}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isUnlocked) ...[
+                  Text(
+                    'LVL ${level.levelNumber}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${level.gridSize}x${level.gridSize} • ${level.targetTimeSeconds}s',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[500],
+                  const SizedBox(height: 2),
+                  Text(
+                    '${level.gridSize}x${level.gridSize} • ${level.targetTimeSeconds}s',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[400],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                // Stars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (starIdx) {
-                    final earned = starIdx < level.stars;
-                    return Icon(
-                      earned ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: earned ? Colors.amber : Colors.grey[400],
-                      size: 16,
-                    );
-                  }),
-                ),
-              ] else ...[
-                Icon(
-                  Icons.lock_rounded,
-                  color: Colors.grey[500],
-                  size: 28,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Lvl ${level.levelNumber}',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 6),
+                  // Stars
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(3, (starIdx) {
+                      final earned = starIdx < level.stars;
+                      return Icon(
+                        earned ? Icons.star_rounded : Icons.star_outline_rounded,
+                        color: earned ? Colors.amber : Colors.grey[600],
+                        size: 16,
+                      );
+                    }),
                   ),
-                ),
+                ] else ...[
+                  Icon(
+                    Icons.lock_rounded,
+                    color: Colors.grey[600],
+                    size: 26,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Lvl ${level.levelNumber}',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
