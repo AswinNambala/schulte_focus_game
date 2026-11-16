@@ -5,7 +5,11 @@ import '../../features/auth/presentation/pages/privacy_policy_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/game/domain/entities/game_config.dart';
+import '../../features/game/domain/entities/game_session.dart';
 import '../../features/game/presentation/pages/game_page.dart';
+import '../../features/levels/domain/entities/level_info.dart';
+import '../../features/levels/presentation/pages/level_result_page.dart';
+import '../../features/levels/presentation/pages/levels_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -97,9 +101,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.levels,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Levels Screen')),
-                  ),
+                  builder: (context, state) => const LevelsPage(),
                 ),
               ],
             ),
@@ -136,9 +138,34 @@ class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.levelResult,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Level Result')),
-          ),
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>? ?? {};
+            final session = args['session'] as GameSession? ??
+                GameSession(
+                  id: 'session_dummy',
+                  userId: '',
+                  tableType: TableType.number,
+                  mode: GameMode.classic,
+                  level: 1,
+                  gridSize: 5,
+                  ringCount: 2,
+                  totalCells: 25,
+                  completionTimeMs: 45000,
+                  errors: 0,
+                  perTapTimesMs: const [],
+                  createdAt: DateTime.now(),
+                );
+            final outcome = args['outcome'] as LevelOutcome? ?? LevelOutcome.levelUp;
+            final stars = args['stars'] as int? ?? 3;
+            final targetSeconds = args['targetTimeSeconds'] as int? ?? 60;
+
+            return LevelResultPage(
+              session: session,
+              outcome: outcome,
+              stars: stars,
+              targetTimeSeconds: targetSeconds,
+            );
+          },
         ),
       ],
     );

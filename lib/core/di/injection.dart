@@ -7,6 +7,9 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/auth_usecases.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/levels/data/repositories/level_repository_impl.dart';
+import '../../features/levels/domain/repositories/level_repository.dart';
+import '../../features/levels/presentation/bloc/level_bloc.dart';
 import '../theme/theme_cubit.dart';
 
 final sl = GetIt.instance;
@@ -52,4 +55,8 @@ Future<void> initDependencies() async {
       logOutUseCase: sl(),
     ),
   );
+
+  // Levels Feature
+  sl.registerLazySingleton<LevelRepository>(() => LevelRepositoryImpl());
+  sl.registerFactory<LevelBloc>(() => LevelBloc(repository: sl()));
 }
