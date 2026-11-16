@@ -50,6 +50,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
   sl.registerLazySingleton(() => SendPasswordResetUseCase(sl()));
   sl.registerLazySingleton(() => LogOutUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl()));
 
   // Auth Bloc
   sl.registerFactory<AuthBloc>(
@@ -60,6 +61,7 @@ Future<void> initDependencies() async {
       signInWithGoogleUseCase: sl(),
       sendPasswordResetUseCase: sl(),
       logOutUseCase: sl(),
+      deleteAccountUseCase: sl(),
     ),
   );
 

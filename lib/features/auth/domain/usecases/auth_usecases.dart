@@ -67,3 +67,12 @@ class LogOutUseCase {
     return repository.logOut();
   }
 }
+
+class DeleteAccountUseCase {
+  final AuthRepository repository;
+  DeleteAccountUseCase(this.repository);
+
+  Future<Either<Failure, Unit>> call({String? password}) {
+    return repository.deleteAccount(password: password);
+  }
+}

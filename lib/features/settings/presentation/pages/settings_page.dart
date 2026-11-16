@@ -205,9 +205,27 @@ class SettingsPage extends StatelessWidget {
 
               // Sign Out Button
               OutlinedButton.icon(
-                icon: const Icon(Icons.logout, color: Colors.redAccent),
+                icon: const Icon(Icons.logout, color: Colors.orangeAccent),
                 label: const Text(
                   'Log Out',
+                  style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.orangeAccent),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () => _confirmSignOut(context),
+              ),
+              const SizedBox(height: 12),
+
+              // Delete Account Button (Google Play Requirement)
+              OutlinedButton.icon(
+                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                label: const Text(
+                  'Delete Account',
                   style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
                 style: OutlinedButton.styleFrom(
@@ -217,7 +235,7 @@ class SettingsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () => _confirmSignOut(context),
+                onPressed: () => _confirmDeleteAccount(context),
               ),
               const SizedBox(height: 32),
             ],
@@ -350,13 +368,76 @@ class SettingsPage extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: Colors.orangeAccent),
             onPressed: () {
               Navigator.of(ctx).pop();
               context.read<AuthBloc>().add(AuthLogOutRequested());
               context.go(AppRoutes.login);
             },
             child: const Text('Log Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context) {
+    final passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Delete Account'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This will permanently delete your account, authentication credentials, levels progress, and all session analytics from our servers.\n\nThis action cannot be undone.',
+              style: TextStyle(height: 1.4),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password (if signed up with email)',
+                hintText: 'Enter current password',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () {
+              final password = passwordController.text.trim();
+              Navigator.of(ctx).pop();
+              context.read<AuthBloc>().add(
+                    AuthDeleteAccountRequested(
+                      password: password.isNotEmpty ? password : null,
+                    ),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Account and data deleted successfully.'),
+                ),
+              );
+              context.go(AppRoutes.login);
+            },
+            child: const Text('Permanently Delete'),
           ),
         ],
       ),

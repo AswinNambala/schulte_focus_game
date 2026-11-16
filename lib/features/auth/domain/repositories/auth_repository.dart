@@ -17,4 +17,5 @@ abstract class AuthRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
   Future<Either<Failure, Unit>> sendPasswordResetEmail(String email);
   Future<Either<Failure, Unit>> logOut();
+  Future<Either<Failure, Unit>> deleteAccount({String? password});
 }
