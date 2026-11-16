@@ -7,10 +7,12 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/game/domain/entities/game_config.dart';
 import '../../features/game/domain/entities/game_session.dart';
 import '../../features/game/presentation/pages/game_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/levels/domain/entities/level_info.dart';
 import '../../features/levels/presentation/pages/level_result_page.dart';
 import '../../features/levels/presentation/pages/levels_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -92,9 +94,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.home,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Home Screen')),
-                  ),
+                  builder: (context, state) => const HomePage(),
                 ),
               ],
             ),
@@ -118,9 +118,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.profile,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Profile Screen')),
-                  ),
+                  builder: (context, state) => const SettingsPage(),
                 ),
               ],
             ),

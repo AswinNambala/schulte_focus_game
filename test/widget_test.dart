@@ -7,6 +7,9 @@ import 'package:schulte_focus/features/levels/domain/repositories/level_reposito
 import 'package:schulte_focus/features/levels/presentation/bloc/level_bloc.dart';
 import 'package:schulte_focus/features/reports/domain/usecases/report_usecases.dart';
 import 'package:schulte_focus/features/reports/presentation/bloc/report_bloc.dart';
+import 'package:schulte_focus/features/settings/domain/entities/app_settings.dart';
+import 'package:schulte_focus/features/settings/domain/repositories/settings_repository.dart';
+import 'package:schulte_focus/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:schulte_focus/core/di/injection.dart' as di;
 import 'package:schulte_focus/core/theme/theme_cubit.dart';
 import 'package:schulte_focus/main.dart';
@@ -22,12 +25,19 @@ class MockLogOutUseCase extends Mock implements LogOutUseCase {}
 class MockLevelRepository extends Mock implements LevelRepository {}
 class MockGetReportsUseCase extends Mock implements GetReportsUseCase {}
 class MockSaveSessionUseCase extends Mock implements SaveSessionUseCase {}
+class MockSettingsRepository extends Mock implements SettingsRepository {}
+class FakeAppSettings extends Fake implements AppSettings {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeAppSettings());
+  });
+
   late MockGetCurrentUserUseCase mockGetCurrentUserUseCase;
   late MockLevelRepository mockLevelRepository;
   late MockGetReportsUseCase mockGetReportsUseCase;
   late MockSaveSessionUseCase mockSaveSessionUseCase;
+  late MockSettingsRepository mockSettingsRepository;
 
   setUp(() {
     mockGetCurrentUserUseCase = MockGetCurrentUserUseCase();
@@ -39,6 +49,12 @@ void main() {
     mockLevelRepository = MockLevelRepository();
     mockGetReportsUseCase = MockGetReportsUseCase();
     mockSaveSessionUseCase = MockSaveSessionUseCase();
+    mockSettingsRepository = MockSettingsRepository();
+
+    when(() => mockSettingsRepository.getSettings()).thenAnswer(
+      (_) async => const AppSettings(),
+    );
+    when(() => mockSettingsRepository.saveSettings(any())).thenAnswer((_) async {});
 
     when(() => mockGetCurrentUserUseCase()).thenAnswer(
       (_) async => Right(
@@ -84,6 +100,9 @@ void main() {
         saveSessionUseCase: mockSaveSessionUseCase,
       ),
     );
+    di.sl.registerFactory<SettingsCubit>(
+      () => SettingsCubit(repository: mockSettingsRepository),
+    );
   });
 
   tearDown(() async {
@@ -92,7 +111,8 @@ void main() {
 
   testWidgets('App renders successfully', (WidgetTester tester) async {
     await tester.pumpWidget(const SchulteFocusApp());
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
     expect(find.byType(SchulteFocusApp), findsOneWidget);
   });
 }
