@@ -35,20 +35,17 @@ void main() {
       expect(textValues.contains('I'), true);
     });
 
-    test('generates circular 3D cells with polar angles across concentric rings', () {
+    test('generates 36 cells for 6x6 pro grid', () {
       const config = GameConfig(
-        mode: GameMode.circular3d,
-        ringCount: 2,
-        totalCells: 18,
+        gridSize: 6,
+        totalCells: 36,
+        mode: GameMode.classic,
       );
 
       final cells = TableGeneratorService.generateCells(config);
 
-      expect(cells.length, 18);
-      for (final cell in cells) {
-        expect(cell.polarAngle >= 0 && cell.polarAngle <= 2 * 3.1416, true);
-        expect(cell.ringIndex == 0 || cell.ringIndex == 1, true);
-      }
+      expect(cells.length, 36);
+      expect(cells.first.value >= 1 && cells.first.value <= 36, true);
     });
 
     test('shuffleRemaining keeps completed cells in place and shuffles uncompleted', () {

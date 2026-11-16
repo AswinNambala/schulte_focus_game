@@ -6,6 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../game/domain/entities/game_config.dart';
 import '../../../game/domain/entities/game_session.dart';
 import '../../domain/entities/level_info.dart';
+import '../../domain/services/adaptive_difficulty_service.dart';
 
 class LevelResultPage extends StatelessWidget {
   final GameSession session;
@@ -144,18 +145,53 @@ class LevelResultPage extends StatelessWidget {
 
               const Spacer(),
 
+              // Next Level Button (if unlocked)
+              if (session.level < 20 && stars >= 1) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    label: Text(
+                      'Next Level (Level ${session.level + 1})',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () {
+                      final defaultLevels = AdaptiveDifficultyService.getDefaultLevels();
+                      final next = defaultLevels.firstWhere(
+                        (l) => l.levelNumber == session.level + 1,
+                        orElse: () => defaultLevels.first,
+                      );
+                      final nextConfig = next.toGameConfig(tableType: session.tableType);
+                      context.pushReplacement(AppRoutes.game, extra: nextConfig);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
               // Action Buttons
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
                       onPressed: () {
                         final config = GameConfig(
                           level: session.level,
                           tableType: session.tableType,
-                          mode: session.mode,
+                          mode: GameMode.classic,
                           gridSize: session.gridSize,
-                          ringCount: session.ringCount,
                           targetTimeSeconds: targetTimeSeconds,
                         );
                         context.pushReplacement(AppRoutes.game, extra: config);
@@ -163,9 +199,15 @@ class LevelResultPage extends StatelessWidget {
                       child: const Text('Replay Level'),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
                       onPressed: () => context.go(AppRoutes.levels),
                       child: const Text('All Levels'),
                     ),

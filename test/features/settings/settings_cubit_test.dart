@@ -31,7 +31,7 @@ void main() {
   group('SettingsCubit Tests', () {
     test('initial state has default AppSettings', () {
       expect(cubit.state, const AppSettings());
-      expect(cubit.state.themeMode, ThemeMode.system);
+      expect(cubit.state.themeMode, ThemeMode.dark);
       expect(cubit.state.soundEnabled, true);
       expect(cubit.state.hapticsEnabled, true);
     });

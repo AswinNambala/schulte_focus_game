@@ -54,57 +54,8 @@ class TableGeneratorService {
       );
     }
 
-    if (config.mode == GameMode.circular3d) {
-      return _assignCircularCoordinates(cells, config.ringCount);
-    } else {
-      // Classic grid: randomly shuffle initial cell placements
-      cells.shuffle(random);
-      return cells;
-    }
-  }
-
-  /// Distributes cells across concentric rings with polar angles
-  static List<GameCell> _assignCircularCoordinates(
-    List<GameCell> cells,
-    int ringCount,
-  ) {
-    final total = cells.length;
-    final List<int> ringCapacities = [];
-
-    if (ringCount == 1) {
-      ringCapacities.add(total);
-    } else if (ringCount == 2) {
-      final inner = (total * 0.35).round();
-      final outer = total - inner;
-      ringCapacities.addAll([inner, outer]);
-    } else {
-      final inner = (total * 0.20).round();
-      final middle = (total * 0.35).round();
-      final outer = total - inner - middle;
-      ringCapacities.addAll([inner, middle, outer]);
-    }
-
-    // Shuffle the cells to randomize their ring and angular positions
-    final shuffled = List<GameCell>.from(cells)..shuffle(Random());
-    final List<GameCell> positioned = [];
-
-    int cellIndex = 0;
-    for (int r = 0; r < ringCapacities.length; r++) {
-      final capacity = ringCapacities[r];
-      for (int i = 0; i < capacity && cellIndex < shuffled.length; i++) {
-        final theta = (2 * pi * i) / capacity;
-        final cell = shuffled[cellIndex];
-        positioned.add(
-          cell.copyWith(
-            ringIndex: r,
-            polarAngle: theta,
-          ),
-        );
-        cellIndex++;
-      }
-    }
-
-    return positioned;
+    cells.shuffle(random);
+    return cells;
   }
 
   /// Shuffles active cells in classic mode after each correct tap
