@@ -34,26 +34,28 @@ class LevelResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Color badgeColor = AppColors.primary;
-    String badgeText = 'MAINTAINED: Consistent Focus';
-    IconData badgeIcon = Icons.remove_rounded;
+    Color badgeColor = AppColors.error;
+    String badgeText = 'TIME LIMIT EXCEEDED: Level Not Cleared';
+    IconData badgeIcon = Icons.timer_off_rounded;
 
-    switch (outcome) {
-      case LevelOutcome.levelUp:
-        badgeColor = AppColors.success;
-        badgeText = 'LEVEL UP! Next Level Unlocked';
-        badgeIcon = Icons.arrow_upward_rounded;
-        break;
-      case LevelOutcome.sameLevel:
-        badgeColor = AppColors.primary;
-        badgeText = 'MAINTAINED: Consistent Focus';
-        badgeIcon = Icons.remove_rounded;
-        break;
-      case LevelOutcome.levelDown:
-        badgeColor = AppColors.warning;
-        badgeText = 'ADAPTIVE: Recommended Ease';
-        badgeIcon = Icons.arrow_downward_rounded;
-        break;
+    if (stars > 0) {
+      switch (outcome) {
+        case LevelOutcome.levelUp:
+          badgeColor = AppColors.success;
+          badgeText = 'LEVEL UP! Next Level Unlocked';
+          badgeIcon = Icons.arrow_upward_rounded;
+          break;
+        case LevelOutcome.sameLevel:
+          badgeColor = AppColors.primary;
+          badgeText = 'MAINTAINED: Consistent Focus';
+          badgeIcon = Icons.remove_rounded;
+          break;
+        case LevelOutcome.levelDown:
+          badgeColor = AppColors.warning;
+          badgeText = 'ADAPTIVE: Recommended Ease';
+          badgeIcon = Icons.arrow_downward_rounded;
+          break;
+      }
     }
 
     return Scaffold(

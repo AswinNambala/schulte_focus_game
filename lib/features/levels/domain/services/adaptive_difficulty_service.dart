@@ -48,7 +48,7 @@ class AdaptiveDifficultyService {
 
   /// Adaptive Logic:
   /// - Under target time with <= 1 error: level up
-  /// - Over 1.5x target time OR 3+ errors: level down
+  /// - Over target time limit OR 3+ errors: level down / fail
   /// - Otherwise: stay at same level
   static LevelOutcome evaluateOutcome({
     required int completionTimeMs,
@@ -58,16 +58,20 @@ class AdaptiveDifficultyService {
   }) {
     final targetTimeMs = targetTimeSeconds * 1000;
 
-    if (completionTimeMs <= targetTimeMs && errors <= 1) {
-      return currentLevel < 20 ? LevelOutcome.levelUp : LevelOutcome.sameLevel;
-    } else if (completionTimeMs > (1.5 * targetTimeMs) || errors >= 3) {
+    if (completionTimeMs > targetTimeMs || errors >= 3) {
       return currentLevel > 1 ? LevelOutcome.levelDown : LevelOutcome.sameLevel;
+    } else if (completionTimeMs <= targetTimeMs && errors <= 1) {
+      return currentLevel < 20 ? LevelOutcome.levelUp : LevelOutcome.sameLevel;
     } else {
       return LevelOutcome.sameLevel;
     }
   }
 
-  /// Calculates stars earned (1 to 3)
+  /// Calculates stars earned (0 to 3):
+  /// - Exceeded target time limit: 0 stars (Level Failed / Not Cleared)
+  /// - Completed in <= 75% of target time with <= 1 error: 3 stars
+  /// - Completed in <= 90% of target time with <= 2 errors: 2 stars
+  /// - Completed within 100% of target time: 1 star
   static int calculateStars({
     required int completionTimeMs,
     required int errors,
@@ -75,9 +79,14 @@ class AdaptiveDifficultyService {
   }) {
     final targetTimeMs = targetTimeSeconds * 1000;
 
-    if (completionTimeMs <= targetTimeMs && errors <= 1) {
+    // Strict time limit: Exceeding time limit results in 0 stars (Level Failed)
+    if (completionTimeMs > targetTimeMs) {
+      return 0;
+    }
+
+    if (completionTimeMs <= (targetTimeMs * 0.75) && errors <= 1) {
       return 3;
-    } else if (completionTimeMs <= (1.5 * targetTimeMs) && errors <= 3) {
+    } else if (completionTimeMs <= (targetTimeMs * 0.90) && errors <= 2) {
       return 2;
     } else {
       return 1;
