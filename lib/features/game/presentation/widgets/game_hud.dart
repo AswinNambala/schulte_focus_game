@@ -78,9 +78,9 @@ class GameHud extends StatelessWidget {
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    nextTarget,
+                    'NEXT: $nextTarget',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),

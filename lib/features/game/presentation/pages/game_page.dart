@@ -173,7 +173,10 @@ class _GameViewState extends State<_GameView> {
                           errors: state.errors,
                           onPause: _showPauseDialog,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 12),
+                        // Prominent Next Target Display (Number or Letter to select)
+                        _buildTargetBanner(context, state),
+                        const SizedBox(height: 12),
                         Expanded(
                           child: Center(
                             child: ClassicGridView(
@@ -207,6 +210,82 @@ class _GameViewState extends State<_GameView> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTargetBanner(BuildContext context, GameState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isNumber = state.config.tableType == TableType.number;
+    final label = isNumber ? 'FIND NUMBER' : 'FIND LETTER';
+
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.35),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isNumber ? Icons.tag_rounded : Icons.sort_by_alpha_rounded,
+              size: 20,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                color: isDark ? Colors.grey[300] : Colors.grey[700],
+              ),
+            ),
+            const SizedBox(width: 14),
+            Container(
+              key: ValueKey(state.nextTargetText),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.secondary],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                state.nextTargetText,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            )
+                .animate(key: ValueKey(state.nextTargetText))
+                .scale(duration: 200.ms, curve: Curves.easeOutBack),
+          ],
+        ),
+      ),
     );
   }
 }
