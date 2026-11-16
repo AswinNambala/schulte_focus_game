@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../settings/presentation/bloc/settings_cubit.dart';
 import '../../domain/entities/game_config.dart';
 import '../bloc/game_bloc.dart';
 import '../bloc/game_event.dart';
@@ -23,9 +24,15 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userId = context.read<AuthBloc>().state.user?.uid ?? '';
+    final settings = context.read<SettingsCubit>().state;
+    final effectiveConfig = config.copyWith(
+      colorCells: settings.colorCells,
+      colorblindPalette: settings.colorblindPalette,
+      autoRotation: config.autoRotation || settings.autoRotation,
+    );
 
     return BlocProvider<GameBloc>(
-      create: (_) => GameBloc(userId: userId)..add(GameInitRequested(config)),
+      create: (_) => GameBloc(userId: userId)..add(GameInitRequested(effectiveConfig)),
       child: const _GameView(),
     );
   }
@@ -107,6 +114,7 @@ class _GameViewState extends State<_GameView> {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == GameStatus.completed) {
+          context.read<SettingsCubit>().recordGamePlayed();
           _showResultDialog(state);
         }
       },

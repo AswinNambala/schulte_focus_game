@@ -14,6 +14,9 @@ import '../../features/reports/data/repositories/report_repository_impl.dart';
 import '../../features/reports/domain/repositories/report_repository.dart';
 import '../../features/reports/domain/usecases/report_usecases.dart';
 import '../../features/reports/presentation/bloc/report_bloc.dart';
+import '../../features/settings/data/repositories/settings_repository_impl.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/settings/presentation/bloc/settings_cubit.dart';
 import '../theme/theme_cubit.dart';
 
 final sl = GetIt.instance;
@@ -76,4 +79,8 @@ Future<void> initDependencies() async {
       saveSessionUseCase: sl(),
     ),
   );
+
+  // Settings Feature
+  sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl());
+  sl.registerFactory<SettingsCubit>(() => SettingsCubit(repository: sl()));
 }
