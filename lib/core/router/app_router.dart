@@ -4,6 +4,8 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/privacy_policy_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
+import '../../features/game/domain/entities/game_config.dart';
+import '../../features/game/presentation/pages/game_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -125,9 +127,12 @@ class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.game,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Game Screen')),
-          ),
+          builder: (context, state) {
+            final config = state.extra is GameConfig
+                ? state.extra as GameConfig
+                : const GameConfig();
+            return GamePage(config: config);
+          },
         ),
         GoRoute(
           path: AppRoutes.levelResult,
