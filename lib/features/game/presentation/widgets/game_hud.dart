@@ -28,115 +28,124 @@ class GameHud extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Next Target Indicator
-          Row(
-            children: [
-              Text(
-                'TARGET:',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                  color: Colors.grey[500],
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Next Target Indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.secondary],
                 ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.secondary],
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.touch_app_rounded,
+                    size: 15,
+                    color: Colors.white70,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    nextTarget,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-                child: Text(
-                  nextTarget,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // Elapsed Timer
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.timer_outlined, size: 16, color: AppColors.primary),
+                const SizedBox(width: 5),
+                Text(
+                  _formatTime(elapsedMs),
                   style: const TextStyle(
+                    fontFamily: 'monospace',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(width: 14),
 
-          // Elapsed Timer
-          Row(
-            children: [
-              const Icon(Icons.timer_outlined, size: 18, color: AppColors.primary),
-              const SizedBox(width: 6),
-              Text(
-                _formatTime(elapsedMs),
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
-          // Errors & Pause
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: errors > 0
-                      ? AppColors.error.withValues(alpha: 0.15)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline_rounded,
-                      size: 16,
-                      color: errors > 0 ? AppColors.error : Colors.grey,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      errors.toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: errors > 0 ? AppColors.error : Colors.grey,
+            // Errors & Pause
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: errors > 0
+                        ? AppColors.error.withValues(alpha: 0.15)
+                        : Colors.grey.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.close_rounded,
+                        size: 14,
+                        color: errors > 0 ? AppColors.error : Colors.grey[400],
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 3),
+                      Text(
+                        errors.toString(),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: errors > 0 ? AppColors.error : Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              IconButton(
-                icon: const Icon(Icons.pause_circle_filled_rounded, size: 28),
-                color: AppColors.primary,
-                onPressed: onPause,
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 6),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: const Icon(Icons.pause_circle_filled_rounded, size: 26),
+                  color: AppColors.primary,
+                  onPressed: onPause,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
