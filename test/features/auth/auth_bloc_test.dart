@@ -15,6 +15,7 @@ class MockSignUpWithEmailUseCase extends Mock implements SignUpWithEmailUseCase 
 class MockSignInWithGoogleUseCase extends Mock implements SignInWithGoogleUseCase {}
 class MockSendPasswordResetUseCase extends Mock implements SendPasswordResetUseCase {}
 class MockLogOutUseCase extends Mock implements LogOutUseCase {}
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
 
 void main() {
   late MockGetCurrentUserUseCase mockGetCurrentUserUseCase;
@@ -23,6 +24,7 @@ void main() {
   late MockSignInWithGoogleUseCase mockSignInWithGoogleUseCase;
   late MockSendPasswordResetUseCase mockSendPasswordResetUseCase;
   late MockLogOutUseCase mockLogOutUseCase;
+  late MockDeleteAccountUseCase mockDeleteAccountUseCase;
   late AuthBloc authBloc;
 
   final testUser = UserEntity(
@@ -39,6 +41,7 @@ void main() {
     mockSignInWithGoogleUseCase = MockSignInWithGoogleUseCase();
     mockSendPasswordResetUseCase = MockSendPasswordResetUseCase();
     mockLogOutUseCase = MockLogOutUseCase();
+    mockDeleteAccountUseCase = MockDeleteAccountUseCase();
 
     authBloc = AuthBloc(
       getCurrentUserUseCase: mockGetCurrentUserUseCase,
@@ -47,6 +50,7 @@ void main() {
       signInWithGoogleUseCase: mockSignInWithGoogleUseCase,
       sendPasswordResetUseCase: mockSendPasswordResetUseCase,
       logOutUseCase: mockLogOutUseCase,
+      deleteAccountUseCase: mockDeleteAccountUseCase,
     );
   });
 
@@ -176,6 +180,40 @@ void main() {
       expect: () => [
         const AuthState(status: AuthStatus.loading),
         const AuthState(status: AuthStatus.unauthenticated),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, unauthenticated] on successful account deletion',
+      build: () {
+        when(() => mockDeleteAccountUseCase(password: any(named: 'password')))
+            .thenAnswer((_) async => const Right(unit));
+        return authBloc;
+      },
+      act: (bloc) => bloc.add(const AuthDeleteAccountRequested(password: 'pass123')),
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(
+          status: AuthStatus.unauthenticated,
+          successMessage: 'Account deleted successfully.',
+        ),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, error] on failed account deletion',
+      build: () {
+        when(() => mockDeleteAccountUseCase(password: any(named: 'password')))
+            .thenAnswer((_) async => const Left(AuthFailure('Requires recent login')));
+        return authBloc;
+      },
+      act: (bloc) => bloc.add(const AuthDeleteAccountRequested(password: 'wrongpass')),
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Requires recent login',
+        ),
       ],
     );
   });

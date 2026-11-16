@@ -11,6 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInWithGoogleUseCase signInWithGoogleUseCase;
   final SendPasswordResetUseCase sendPasswordResetUseCase;
   final LogOutUseCase logOutUseCase;
+  final DeleteAccountUseCase deleteAccountUseCase;
 
   AuthBloc({
     required this.getCurrentUserUseCase,
@@ -19,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.signInWithGoogleUseCase,
     required this.sendPasswordResetUseCase,
     required this.logOutUseCase,
+    required this.deleteAccountUseCase,
   }) : super(const AuthState()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthLoginRequested>(_onAuthLoginRequested);
@@ -26,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthGoogleSignInRequested>(_onAuthGoogleSignInRequested);
     on<AuthPasswordResetRequested>(_onAuthPasswordResetRequested);
     on<AuthLogOutRequested>(_onAuthLogOutRequested);
+    on<AuthDeleteAccountRequested>(_onAuthDeleteAccountRequested);
   }
 
   Future<void> _onAuthCheckRequested(
@@ -145,5 +148,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(status: AuthStatus.loading));
     await logOutUseCase();
     emit(const AuthState(status: AuthStatus.unauthenticated));
+  }
+
+  Future<void> _onAuthDeleteAccountRequested(
+    AuthDeleteAccountRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(status: AuthStatus.loading, clearError: true));
+    final result = await deleteAccountUseCase(password: event.password);
+    result.fold(
+      (failure) => emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      )),
+      (_) => emit(const AuthState(
+        status: AuthStatus.unauthenticated,
+        successMessage: 'Account deleted successfully.',
+      )),
+    );
   }
 }

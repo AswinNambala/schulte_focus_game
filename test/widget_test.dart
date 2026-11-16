@@ -22,6 +22,7 @@ class MockSignUpWithEmailUseCase extends Mock implements SignUpWithEmailUseCase 
 class MockSignInWithGoogleUseCase extends Mock implements SignInWithGoogleUseCase {}
 class MockSendPasswordResetUseCase extends Mock implements SendPasswordResetUseCase {}
 class MockLogOutUseCase extends Mock implements LogOutUseCase {}
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
 class MockLevelRepository extends Mock implements LevelRepository {}
 class MockGetReportsUseCase extends Mock implements GetReportsUseCase {}
 class MockSaveSessionUseCase extends Mock implements SaveSessionUseCase {}
@@ -46,6 +47,7 @@ void main() {
     final mockGoogle = MockSignInWithGoogleUseCase();
     final mockReset = MockSendPasswordResetUseCase();
     final mockLogout = MockLogOutUseCase();
+    final mockDelete = MockDeleteAccountUseCase();
     mockLevelRepository = MockLevelRepository();
     mockGetReportsUseCase = MockGetReportsUseCase();
     mockSaveSessionUseCase = MockSaveSessionUseCase();
@@ -91,6 +93,7 @@ void main() {
         signInWithGoogleUseCase: mockGoogle,
         sendPasswordResetUseCase: mockReset,
         logOutUseCase: mockLogout,
+        deleteAccountUseCase: mockDelete,
       ),
     );
     di.sl.registerFactory<LevelBloc>(() => LevelBloc(repository: mockLevelRepository));
