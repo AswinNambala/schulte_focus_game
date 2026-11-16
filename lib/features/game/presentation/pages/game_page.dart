@@ -9,6 +9,7 @@ import '../../domain/entities/game_config.dart';
 import '../bloc/game_bloc.dart';
 import '../bloc/game_event.dart';
 import '../bloc/game_state.dart';
+import '../widgets/circular_3d_view.dart';
 import '../widgets/classic_grid_view.dart';
 import '../widgets/game_hud.dart';
 import '../widgets/game_pause_dialog.dart';
@@ -133,13 +134,23 @@ class _GameViewState extends State<_GameView> {
                         const SizedBox(height: 24),
                         Expanded(
                           child: Center(
-                            child: ClassicGridView(
-                              gridSize: state.config.gridSize,
-                              cells: state.cells,
-                              onCellTapped: (cell) {
-                                context.read<GameBloc>().add(GameCellTapped(cell));
-                              },
-                            ),
+                            child: state.config.mode == GameMode.circular3d
+                                ? Circular3DView(
+                                    cells: state.cells,
+                                    ringCount: state.config.ringCount,
+                                    autoRotation: state.config.autoRotation,
+                                    rotationSpeed: state.config.rotationSpeed,
+                                    onCellTapped: (cell) {
+                                      context.read<GameBloc>().add(GameCellTapped(cell));
+                                    },
+                                  )
+                                : ClassicGridView(
+                                    gridSize: state.config.gridSize,
+                                    cells: state.cells,
+                                    onCellTapped: (cell) {
+                                      context.read<GameBloc>().add(GameCellTapped(cell));
+                                    },
+                                  ),
                           ),
                         ),
                       ],
