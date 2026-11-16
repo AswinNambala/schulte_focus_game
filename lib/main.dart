@@ -10,6 +10,8 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/levels/presentation/bloc/level_bloc.dart';
+import 'features/levels/presentation/bloc/level_event.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -57,6 +59,9 @@ class SchulteFocusApp extends StatelessWidget {
         ),
         BlocProvider<AuthBloc>(
           create: (_) => di.sl<AuthBloc>(),
+        ),
+        BlocProvider<LevelBloc>(
+          create: (_) => di.sl<LevelBloc>()..add(LoadLevelsEvent()),
         ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
