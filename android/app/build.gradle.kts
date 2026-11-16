@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -24,7 +26,6 @@ android {
 
     buildTypes {
         release {
-            // Signing with debug for now, release signing will be configured in feature/android-release-config
             signingConfig = signingConfigs.getByName("debug")
         }
     }
