@@ -10,6 +10,10 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/levels/data/repositories/level_repository_impl.dart';
 import '../../features/levels/domain/repositories/level_repository.dart';
 import '../../features/levels/presentation/bloc/level_bloc.dart';
+import '../../features/reports/data/repositories/report_repository_impl.dart';
+import '../../features/reports/domain/repositories/report_repository.dart';
+import '../../features/reports/domain/usecases/report_usecases.dart';
+import '../../features/reports/presentation/bloc/report_bloc.dart';
 import '../theme/theme_cubit.dart';
 
 final sl = GetIt.instance;
@@ -59,4 +63,17 @@ Future<void> initDependencies() async {
   // Levels Feature
   sl.registerLazySingleton<LevelRepository>(() => LevelRepositoryImpl());
   sl.registerFactory<LevelBloc>(() => LevelBloc(repository: sl()));
+
+  // Reports Feature
+  sl.registerLazySingleton<ReportRepository>(
+    () => ReportRepositoryImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton(() => GetReportsUseCase(sl()));
+  sl.registerLazySingleton(() => SaveSessionUseCase(sl()));
+  sl.registerFactory<ReportBloc>(
+    () => ReportBloc(
+      getReportsUseCase: sl(),
+      saveSessionUseCase: sl(),
+    ),
+  );
 }

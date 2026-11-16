@@ -10,6 +10,7 @@ import '../../features/game/presentation/pages/game_page.dart';
 import '../../features/levels/domain/entities/level_info.dart';
 import '../../features/levels/presentation/pages/level_result_page.dart';
 import '../../features/levels/presentation/pages/levels_page.dart';
+import '../../features/reports/presentation/pages/reports_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -109,9 +110,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.reports,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Reports Screen')),
-                  ),
+                  builder: (context, state) => const ReportsPage(),
                 ),
               ],
             ),
