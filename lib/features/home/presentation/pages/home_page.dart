@@ -304,9 +304,11 @@ class HomePage extends StatelessWidget {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
+                level: 0,
                 tableType: TableType.number,
                 mode: GameMode.classic,
                 gridSize: 5,
+                targetTimeSeconds: 60,
               ),
             );
           },
@@ -321,9 +323,11 @@ class HomePage extends StatelessWidget {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
+                level: 0,
                 tableType: TableType.letter,
                 mode: GameMode.classic,
                 gridSize: 5,
+                targetTimeSeconds: 60,
               ),
             );
           },
@@ -338,6 +342,7 @@ class HomePage extends StatelessWidget {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
+                level: 0,
                 tableType: TableType.number,
                 mode: GameMode.classic,
                 gridSize: 3,
@@ -356,6 +361,7 @@ class HomePage extends StatelessWidget {
             context.push(
               AppRoutes.game,
               extra: const GameConfig(
+                level: 0,
                 tableType: TableType.number,
                 mode: GameMode.classic,
                 gridSize: 6,

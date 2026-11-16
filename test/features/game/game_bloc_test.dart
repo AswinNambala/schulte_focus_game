@@ -138,5 +138,21 @@ void main() {
         const GameState(status: GameStatus.running),
       ],
     );
+
+    blocTest<GameBloc, GameState>(
+      'ends game with timeUp status when timer exceeds targetTimeSeconds',
+      build: () => gameBloc,
+      seed: () => const GameState(
+        status: GameStatus.running,
+        config: GameConfig(targetTimeSeconds: 10),
+      ),
+      act: (bloc) => bloc.add(const GameTimerTicked(10000)),
+      verify: (bloc) {
+        expect(bloc.state.status, GameStatus.timeUp);
+        expect(bloc.state.stars, 0);
+        expect(bloc.state.isFinished, true);
+        expect(bloc.state.isCleared, false);
+      },
+    );
   });
 }

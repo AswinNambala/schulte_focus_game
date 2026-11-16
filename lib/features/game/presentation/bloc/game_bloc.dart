@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/haptic_feedback_helper.dart';
+import '../../../levels/domain/services/adaptive_difficulty_service.dart';
 import '../../domain/entities/game_cell.dart';
 import '../../domain/entities/game_config.dart';
 import '../../domain/entities/game_session.dart';
@@ -71,13 +72,14 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       if (isFinished) {
         _timer?.cancel();
-        final targetMs = state.config.targetTimeSeconds * 1000;
-        int stars = 1;
-        if (currentElapsed <= targetMs && state.errors <= 1) {
-          stars = 3;
-        } else if (currentElapsed <= (targetMs * 1.5) && state.errors <= 3) {
-          stars = 2;
-        }
+        final targetSeconds = state.config.targetTimeSeconds;
+        final stars = targetSeconds > 0
+            ? AdaptiveDifficultyService.calculateStars(
+                completionTimeMs: currentElapsed,
+                errors: state.errors,
+                targetTimeSeconds: targetSeconds,
+              )
+            : 1;
 
         final session = GameSession(
           id: 'session_${DateTime.now().millisecondsSinceEpoch}',
@@ -96,7 +98,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
         emit(
           state.copyWith(
-            status: GameStatus.completed,
+            status: stars > 0 ? GameStatus.completed : GameStatus.timeUp,
             perTapTimesMs: updatedReactionTimes,
             completedSession: session,
             stars: stars,
@@ -149,6 +151,41 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
   ) {
     if (state.status == GameStatus.running) {
+      final targetSeconds = state.config.targetTimeSeconds;
+      final targetMs = targetSeconds * 1000;
+
+      // Strict time limit: When time runs out, game ends immediately
+      if (targetSeconds > 0 && event.elapsedMs >= targetMs) {
+        _timer?.cancel();
+        HapticFeedbackHelper.errorImpact();
+
+        final session = GameSession(
+          id: 'session_${DateTime.now().millisecondsSinceEpoch}',
+          userId: userId,
+          tableType: state.config.tableType,
+          mode: state.config.mode,
+          level: state.config.level,
+          gridSize: state.config.gridSize,
+          ringCount: state.config.ringCount,
+          totalCells: state.config.totalCells,
+          completionTimeMs: targetMs,
+          errors: state.errors,
+          perTapTimesMs: state.perTapTimesMs,
+          createdAt: DateTime.now(),
+        );
+
+        emit(
+          state.copyWith(
+            status: GameStatus.timeUp,
+            elapsedMs: targetMs,
+            completedSession: session,
+            stars: 0,
+            hasWrongTapFlash: true,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           elapsedMs: event.elapsedMs,

@@ -132,20 +132,21 @@ class _GameViewState extends State<_GameView> {
     return BlocConsumer<GameBloc, GameState>(
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
-        if (state.status == GameStatus.completed) {
+        if (state.status == GameStatus.completed || state.status == GameStatus.timeUp) {
           final session = state.completedSession;
           if (session != null) {
-            // 1. Calculate & store level progress in LevelBloc
-            context.read<LevelBloc>().add(
-                  LevelCompletedEvent(
-                    session: session,
-                    targetTimeSeconds: state.config.targetTimeSeconds,
-                  ),
-                );
-            // 2. Record session in ReportBloc
+            // 1. Only store progress and update streak if level was cleared (stars >= 1 and level > 0)
+            if (state.stars >= 1 && session.level > 0) {
+              context.read<LevelBloc>().add(
+                    LevelCompletedEvent(
+                      session: session,
+                      targetTimeSeconds: state.config.targetTimeSeconds,
+                    ),
+                  );
+              context.read<SettingsCubit>().recordGamePlayed();
+            }
+            // 2. Always record session in ReportBloc for analytics
             context.read<ReportBloc>().add(RecordSessionEvent(session));
-            // 3. Update streak in SettingsCubit
-            context.read<SettingsCubit>().recordGamePlayed();
           }
           _showResultDialog(state);
         }
@@ -168,6 +169,7 @@ class _GameViewState extends State<_GameView> {
                         GameHud(
                           nextTarget: state.nextTargetText,
                           elapsedMs: state.elapsedMs,
+                          targetTimeSeconds: state.config.targetTimeSeconds,
                           errors: state.errors,
                           onPause: _showPauseDialog,
                         ),

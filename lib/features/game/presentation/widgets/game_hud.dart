@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 class GameHud extends StatelessWidget {
   final String nextTarget;
   final int elapsedMs;
+  final int targetTimeSeconds;
   final int errors;
   final VoidCallback onPause;
 
@@ -11,6 +12,7 @@ class GameHud extends StatelessWidget {
     super.key,
     required this.nextTarget,
     required this.elapsedMs,
+    this.targetTimeSeconds = 0,
     required this.errors,
     required this.onPause,
   });
@@ -26,6 +28,11 @@ class GameHud extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasLimit = targetTimeSeconds > 0;
+    final remainingMs = hasLimit
+        ? (targetTimeSeconds * 1000 - elapsedMs).clamp(0, targetTimeSeconds * 1000)
+        : elapsedMs;
+    final isLowTime = hasLimit && remainingMs <= 5000;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -83,19 +90,40 @@ class GameHud extends StatelessWidget {
             ),
             const SizedBox(width: 14),
 
-            // Elapsed Timer
+            // Timer (Countdown if level has target time limit)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.timer_outlined, size: 16, color: AppColors.primary),
+                Icon(
+                  isLowTime ? Icons.alarm_on_rounded : Icons.timer_outlined,
+                  size: 16,
+                  color: isLowTime ? AppColors.error : AppColors.primary,
+                ),
                 const SizedBox(width: 5),
-                Text(
-                  _formatTime(elapsedMs),
-                  style: const TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formatTime(hasLimit ? remainingMs : elapsedMs),
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isLowTime ? AppColors.error : null,
+                      ),
+                    ),
+                    if (hasLimit)
+                      Text(
+                        'LIMIT: ${targetTimeSeconds}s',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.8,
+                          color: isLowTime ? AppColors.error : Colors.grey[500],
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
