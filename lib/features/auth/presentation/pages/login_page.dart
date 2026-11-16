@@ -132,16 +132,26 @@ class _LoginPageState extends State<LoginPage> {
                       // Header
                       Center(
                         child: Container(
-                          width: 80,
-                          height: 80,
+                          width: 84,
+                          height: 84,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(22),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.25),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
-                          child: const Icon(
-                            Icons.grid_4x4_rounded,
-                            size: 44,
-                            color: AppColors.primary,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'assets/schulte_table_logo.png',
+                              width: 84,
+                              height: 84,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ).animate().scale(duration: 400.ms),
