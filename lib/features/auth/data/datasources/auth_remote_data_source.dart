@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/user_model.dart';
@@ -13,6 +14,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> signInWithGoogle();
   Future<void> sendPasswordResetEmail(String email);
   Future<void> logOut();
+  Future<void> deleteAccount({String? password});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -144,6 +146,66 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         firebaseAuth.signOut(),
         googleSignIn.signOut(),
       ]);
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteAccount({String? password}) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        throw const AuthException('No user is currently signed in.');
+      }
+
+      // Re-authenticate if password is provided
+      if (password != null && password.isNotEmpty && user.email != null) {
+        final credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: password,
+        );
+        await user.reauthenticateWithCredential(credential);
+      }
+
+      final uid = user.uid;
+
+      // 1. Delete Firestore sessions subcollection
+      final sessions = await firestore
+          .collection(AppConstants.usersCollection)
+          .doc(uid)
+          .collection(AppConstants.sessionsSubCollection)
+          .get();
+
+      for (final doc in sessions.docs) {
+        await doc.reference.delete();
+      }
+
+      // 2. Delete user doc in Firestore
+      await firestore.collection(AppConstants.usersCollection).doc(uid).delete();
+
+      // 3. Clear local Hive caches
+      try {
+        if (Hive.isBoxOpen('levels_progress_box')) {
+          await Hive.box('levels_progress_box').clear();
+        }
+        if (Hive.isBoxOpen('sessions_cache_box')) {
+          await Hive.box('sessions_cache_box').clear();
+        }
+        if (Hive.isBoxOpen('pending_sync_box')) {
+          await Hive.box('pending_sync_box').clear();
+        }
+      } catch (_) {}
+
+      // 4. Delete Firebase Auth user
+      await user.delete();
+
+      // 5. Sign out Google if linked
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(e.message ?? 'Account deletion failed');
     } catch (e) {
       throw AuthException(e.toString());
     }
