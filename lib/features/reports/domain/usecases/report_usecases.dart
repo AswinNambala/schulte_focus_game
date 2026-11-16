@@ -20,3 +20,12 @@ class SaveSessionUseCase {
     return repository.saveSession(session);
   }
 }
+
+class SyncPendingSessionsUseCase {
+  final ReportRepository repository;
+  SyncPendingSessionsUseCase(this.repository);
+
+  Future<Either<Failure, int>> call(String userId) {
+    return repository.syncPendingSessions(userId);
+  }
+}
