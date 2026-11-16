@@ -9,6 +9,7 @@ import 'core/observer/app_bloc_observer.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -49,8 +50,15 @@ class SchulteFocusApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ThemeCubit>(
-      create: (_) => di.sl<ThemeCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ThemeCubit>(
+          create: (_) => di.sl<ThemeCubit>(),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (_) => di.sl<AuthBloc>(),
+        ),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           final router = AppRouter.createRouter();
