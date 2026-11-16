@@ -5,6 +5,8 @@ import 'package:schulte_focus/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:schulte_focus/features/levels/domain/entities/level_info.dart';
 import 'package:schulte_focus/features/levels/domain/repositories/level_repository.dart';
 import 'package:schulte_focus/features/levels/presentation/bloc/level_bloc.dart';
+import 'package:schulte_focus/features/reports/domain/usecases/report_usecases.dart';
+import 'package:schulte_focus/features/reports/presentation/bloc/report_bloc.dart';
 import 'package:schulte_focus/core/di/injection.dart' as di;
 import 'package:schulte_focus/core/theme/theme_cubit.dart';
 import 'package:schulte_focus/main.dart';
@@ -18,10 +20,14 @@ class MockSignInWithGoogleUseCase extends Mock implements SignInWithGoogleUseCas
 class MockSendPasswordResetUseCase extends Mock implements SendPasswordResetUseCase {}
 class MockLogOutUseCase extends Mock implements LogOutUseCase {}
 class MockLevelRepository extends Mock implements LevelRepository {}
+class MockGetReportsUseCase extends Mock implements GetReportsUseCase {}
+class MockSaveSessionUseCase extends Mock implements SaveSessionUseCase {}
 
 void main() {
   late MockGetCurrentUserUseCase mockGetCurrentUserUseCase;
   late MockLevelRepository mockLevelRepository;
+  late MockGetReportsUseCase mockGetReportsUseCase;
+  late MockSaveSessionUseCase mockSaveSessionUseCase;
 
   setUp(() {
     mockGetCurrentUserUseCase = MockGetCurrentUserUseCase();
@@ -31,6 +37,8 @@ void main() {
     final mockReset = MockSendPasswordResetUseCase();
     final mockLogout = MockLogOutUseCase();
     mockLevelRepository = MockLevelRepository();
+    mockGetReportsUseCase = MockGetReportsUseCase();
+    mockSaveSessionUseCase = MockSaveSessionUseCase();
 
     when(() => mockGetCurrentUserUseCase()).thenAnswer(
       (_) async => Right(
@@ -56,6 +64,8 @@ void main() {
     );
     when(() => mockLevelRepository.getHighestUnlockedLevel()).thenAnswer((_) async => 1);
 
+    when(() => mockGetReportsUseCase(any())).thenAnswer((_) async => const Right([]));
+
     di.sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit());
     di.sl.registerFactory<AuthBloc>(
       () => AuthBloc(
@@ -68,6 +78,12 @@ void main() {
       ),
     );
     di.sl.registerFactory<LevelBloc>(() => LevelBloc(repository: mockLevelRepository));
+    di.sl.registerFactory<ReportBloc>(
+      () => ReportBloc(
+        getReportsUseCase: mockGetReportsUseCase,
+        saveSessionUseCase: mockSaveSessionUseCase,
+      ),
+    );
   });
 
   tearDown(() async {
