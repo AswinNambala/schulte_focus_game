@@ -48,3 +48,11 @@ class ChartTableTypeFilterChangedEvent extends ReportEvent {
   @override
   List<Object?> get props => [tableType];
 }
+
+class SyncPendingSessionsEvent extends ReportEvent {
+  final String userId;
+  const SyncPendingSessionsEvent(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}

@@ -12,6 +12,7 @@ class ReportState extends Equatable {
   final int daysRange; // 7 or 30 days for bar chart
   final GameMode selectedChartMode;
   final TableType selectedChartTableType;
+  final int pendingSyncCount;
   final String? errorMessage;
 
   const ReportState({
@@ -21,6 +22,7 @@ class ReportState extends Equatable {
     this.daysRange = 7,
     this.selectedChartMode = GameMode.classic,
     this.selectedChartTableType = TableType.number,
+    this.pendingSyncCount = 0,
     this.errorMessage,
   });
 
@@ -38,6 +40,7 @@ class ReportState extends Equatable {
     int? daysRange,
     GameMode? selectedChartMode,
     TableType? selectedChartTableType,
+    int? pendingSyncCount,
     String? errorMessage,
   }) {
     return ReportState(
@@ -47,6 +50,7 @@ class ReportState extends Equatable {
       daysRange: daysRange ?? this.daysRange,
       selectedChartMode: selectedChartMode ?? this.selectedChartMode,
       selectedChartTableType: selectedChartTableType ?? this.selectedChartTableType,
+      pendingSyncCount: pendingSyncCount ?? this.pendingSyncCount,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -59,6 +63,7 @@ class ReportState extends Equatable {
         daysRange,
         selectedChartMode,
         selectedChartTableType,
+        pendingSyncCount,
         errorMessage,
       ];
 }
