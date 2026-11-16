@@ -10,6 +10,7 @@ enum GameStatus {
   running,
   paused,
   completed,
+  timeUp,
 }
 
 class GameState extends Equatable {
@@ -38,6 +39,9 @@ class GameState extends Equatable {
     this.completedSession,
     this.stars = 0,
   });
+
+  bool get isFinished => status == GameStatus.completed || status == GameStatus.timeUp;
+  bool get isCleared => status == GameStatus.completed && stars >= 1;
 
   String get nextTargetText {
     final targetCell = cells.firstWhere(

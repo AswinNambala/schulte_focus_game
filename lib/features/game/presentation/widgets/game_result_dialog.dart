@@ -30,6 +30,21 @@ class GameResultDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isCleared = stars >= 1;
+
+    final String title = isCleared
+        ? (stars == 3
+            ? 'Excellent Focus!'
+            : (stars == 2 ? 'Great Job!' : 'Level Cleared!'))
+        : "Time's Up!";
+
+    final String subtitle = isCleared
+        ? (session.level > 0
+            ? 'Level ${session.level} Cleared ($stars/3 Stars)'
+            : 'Session Completed ($stars/3 Stars)')
+        : (session.level > 0
+            ? 'Level ${session.level} Not Cleared (Time Limit Exceeded)'
+            : 'Session Ended (Time Limit Exceeded)');
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -58,17 +73,17 @@ class GameResultDialog extends StatelessWidget {
             const SizedBox(height: 12),
 
             Text(
-              stars == 3
-                  ? 'Excellent Focus!'
-                  : (stars == 2 ? 'Great Job!' : 'Completed!'),
-              style: const TextStyle(
+              title,
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: isCleared ? null : AppColors.error,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              'Level ${session.level} Cleared ($stars/3 Stars)',
+              subtitle,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[400],
@@ -98,58 +113,93 @@ class GameResultDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Next Level Button (Primary)
-            if (onNextLevel != null) ...[
+            // Action Buttons
+            if (!isCleared) ...[
+              // Level Failed / Time's Up Actions
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  label: Text(
-                    'Play Level ${session.level + 1}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  icon: const Icon(Icons.replay_rounded),
+                  label: const Text(
+                    'Try Again',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  onPressed: onNextLevel,
+                  onPressed: onPlayAgain,
                 ),
               ),
               const SizedBox(height: 10),
-            ],
-
-            // Secondary Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: onContinue,
+                  child: const Text('All Levels'),
+                ),
+              ),
+            ] else ...[
+              // Level Cleared Actions
+              if (onNextLevel != null) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: onPlayAgain,
-                    child: const Text('Replay'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    label: Text(
+                      'Play Level ${session.level + 1}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    onPressed: onContinue,
-                    child: const Text('All Levels'),
+                    onPressed: onNextLevel,
                   ),
                 ),
+                const SizedBox(height: 10),
               ],
-            ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: onPlayAgain,
+                      child: const Text('Replay'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: onContinue,
+                      child: const Text('All Levels'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

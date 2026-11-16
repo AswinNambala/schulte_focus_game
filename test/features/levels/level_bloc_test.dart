@@ -93,7 +93,7 @@ void main() {
             gridSize: 3,
             ringCount: 1,
             totalCells: 9,
-            completionTimeMs: 12000,
+            completionTimeMs: 10000,
             errors: 0,
             perTapTimesMs: const [1000, 1100],
             createdAt: DateTime.now(),
