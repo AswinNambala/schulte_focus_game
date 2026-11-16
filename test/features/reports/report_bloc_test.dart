@@ -12,11 +12,13 @@ import 'package:schulte_focus/features/reports/presentation/bloc/report_state.da
 
 class MockGetReportsUseCase extends Mock implements GetReportsUseCase {}
 class MockSaveSessionUseCase extends Mock implements SaveSessionUseCase {}
+class MockSyncPendingSessionsUseCase extends Mock implements SyncPendingSessionsUseCase {}
 class FakeGameSession extends Fake implements GameSession {}
 
 void main() {
   late MockGetReportsUseCase mockGetReportsUseCase;
   late MockSaveSessionUseCase mockSaveSessionUseCase;
+  late MockSyncPendingSessionsUseCase mockSyncPendingSessionsUseCase;
   late ReportBloc reportBloc;
 
   setUpAll(() {
@@ -41,9 +43,11 @@ void main() {
   setUp(() {
     mockGetReportsUseCase = MockGetReportsUseCase();
     mockSaveSessionUseCase = MockSaveSessionUseCase();
+    mockSyncPendingSessionsUseCase = MockSyncPendingSessionsUseCase();
     reportBloc = ReportBloc(
       getReportsUseCase: mockGetReportsUseCase,
       saveSessionUseCase: mockSaveSessionUseCase,
+      syncPendingSessionsUseCase: mockSyncPendingSessionsUseCase,
     );
   });
 
@@ -113,6 +117,19 @@ void main() {
       expect: () => [
         const ReportState(daysRange: 30),
       ],
+    );
+
+    blocTest<ReportBloc, ReportState>(
+      'triggers sync and reloads sessions on SyncPendingSessionsEvent',
+      setUp: () {
+        when(() => mockSyncPendingSessionsUseCase(any())).thenAnswer((_) async => const Right(2));
+        when(() => mockGetReportsUseCase(any())).thenAnswer((_) async => Right([testSession]));
+      },
+      build: () => reportBloc,
+      act: (bloc) => bloc.add(const SyncPendingSessionsEvent('u1')),
+      verify: (_) {
+        verify(() => mockSyncPendingSessionsUseCase('u1')).called(1);
+      },
     );
   });
 }

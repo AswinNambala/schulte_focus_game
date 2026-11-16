@@ -73,10 +73,12 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton(() => GetReportsUseCase(sl()));
   sl.registerLazySingleton(() => SaveSessionUseCase(sl()));
+  sl.registerLazySingleton(() => SyncPendingSessionsUseCase(sl()));
   sl.registerFactory<ReportBloc>(
     () => ReportBloc(
       getReportsUseCase: sl(),
       saveSessionUseCase: sl(),
+      syncPendingSessionsUseCase: sl(),
     ),
   );
 

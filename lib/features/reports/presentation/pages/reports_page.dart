@@ -44,6 +44,22 @@ class _ReportsPageState extends State<ReportsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Performance & Analytics'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sync_rounded),
+            tooltip: 'Sync Offline Sessions',
+            onPressed: () {
+              final uid = context.read<AuthBloc>().state.user?.uid ?? '';
+              context.read<ReportBloc>().add(SyncPendingSessionsEvent(uid));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Syncing sessions with Cloud Firestore...'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<ReportBloc, ReportState>(
         builder: (context, state) {
